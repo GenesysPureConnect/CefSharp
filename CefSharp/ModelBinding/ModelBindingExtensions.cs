@@ -21,9 +21,9 @@ namespace CefSharp.ModelBinding
         /// <param name="nonPublic"><see langword="true"/> if a non-public constructor can be used, otherwise <see langword="false"/>.</param>
         public static T CreateInstance<T>(this Type type, bool nonPublic = false)
         {
-            if (!typeof(T).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
+            if (!typeof(T).IsAssignableFrom(type))
             {
-                throw new InvalidOperationException("Unable to create instance of " + type.GetTypeInfo().FullName + "since it can't be cast to " + typeof(T).GetTypeInfo().FullName);
+                throw new InvalidOperationException("Unable to create instance of " + type.FullName + "since it can't be cast to " + typeof(T).FullName);
             }
 
             return (T)CreateInstance(type, nonPublic);
@@ -46,7 +46,7 @@ namespace CefSharp.ModelBinding
         /// <returns> The assembly that contains the type </returns>
         public static Assembly GetAssembly(this Type source)
         {
-            return source.GetTypeInfo().Assembly;
+            return source.Assembly;
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace CefSharp.ModelBinding
         public static bool IsArray(this Type source)
         {
 
-            return source.GetTypeInfo().BaseType == typeof(Array);
+            return source.BaseType == typeof(Array);
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace CefSharp.ModelBinding
             return givenType == genericType
                 || givenType.MapsToGenericTypeDefinition(genericType)
                 || givenType.HasInterfaceThatMapsToGenericTypeDefinition(genericType)
-                || givenType.GetTypeInfo().BaseType.IsAssignableToGenericType(genericType);
+                || givenType.BaseType.IsAssignableToGenericType(genericType);
         }
 
         /// <summary>
@@ -98,9 +98,9 @@ namespace CefSharp.ModelBinding
         {
             var collectionType = typeof(ICollection<>);
 
-            return source.GetTypeInfo().IsGenericType && source
+            return source.IsGenericType && source
                 .GetInterfaces()
-                .Any(i => i.GetTypeInfo().IsGenericType && i.GetGenericTypeDefinition() == collectionType);
+                .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == collectionType);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace CefSharp.ModelBinding
         {
             var enumerableType = typeof(IEnumerable<>);
 
-            return source.GetTypeInfo().IsGenericType && source.GetGenericTypeDefinition() == enumerableType;
+            return source.IsGenericType && source.GetGenericTypeDefinition() == enumerableType;
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace CefSharp.ModelBinding
 
             var underlyingType = Nullable.GetUnderlyingType(source) ?? source;
 
-            if (underlyingType.GetTypeInfo().IsEnum)
+            if (underlyingType.IsEnum)
             {
                 return false;
             }
@@ -169,14 +169,14 @@ namespace CefSharp.ModelBinding
         {
             return givenType
                 .GetInterfaces()
-                .Where(it => it.GetTypeInfo().IsGenericType)
+                .Where(it => it.IsGenericType)
                 .Any(it => it.GetGenericTypeDefinition() == genericType);
         }
 
         private static bool MapsToGenericTypeDefinition(this Type givenType, Type genericType)
         {
-            return genericType.GetTypeInfo().IsGenericTypeDefinition
-                && givenType.GetTypeInfo().IsGenericType
+            return genericType.IsGenericTypeDefinition
+                && givenType.IsGenericType
                 && givenType.GetGenericTypeDefinition() == genericType;
         }
 
@@ -212,7 +212,7 @@ namespace CefSharp.ModelBinding
                 return TypeCode.DateTime;
             else if (type == typeof(string))
                 return TypeCode.String;
-            else if (type.GetTypeInfo().IsEnum)
+            else if (type.IsEnum)
                 return GetTypeCode(Enum.GetUnderlyingType(type));
             else
                 return TypeCode.Object;
@@ -232,9 +232,7 @@ namespace CefSharp.ModelBinding
 
         private static ConstructorInfo GetDefaultConstructor(this Type type, bool nonPublic = false)
         {
-            var typeInfo = type.GetTypeInfo();
-
-            var constructors = typeInfo.DeclaredConstructors;
+            var constructors = type.GetConstructors();
 
             foreach (var constructor in constructors)
             {
