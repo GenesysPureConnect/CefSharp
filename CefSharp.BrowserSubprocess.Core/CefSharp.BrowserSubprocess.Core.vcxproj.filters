@@ -159,9 +159,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Resource.rc" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ResourceCompile Include="CefSharp.BrowserSubprocess.Core.rc" />
   </ItemGroup>
 </Project>

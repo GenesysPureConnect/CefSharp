@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by Resource.rc
+// Used by CefSharp.BrowserSubprocess.Core.rc
 
 // Next default values for new objects
 // 
